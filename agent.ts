@@ -71,6 +71,33 @@ Your owner is in IST timezone (+05:30)
 Time and date now for your owner is ${getCurrentTimeInTimeZone("Asia/Kolkata")}
 `;
 
+// Push the SYSTEM PROMPT to our messages array
+messages.push({
+  role: 'system',
+  content: SYSTEM_PROMPT
+});
+
+const check_appointment_availability = (datetime: string) => {
+  console.log("Calling check_appointment_availability ", datetime)
+  return true;
+}
+
+const schedule_appointment = (datetime: string, name: string, email: string) => {
+  console.log("Calling schedule_appointment ", datetime, name, email)
+  return true;
+}
+
+const delete_appointment = (datetime: string, name: string, email: string) => {
+  console.log("Calling delete_appointment ", datetime, name, email)
+  return true;
+}
+
+const function_map = {
+  'check_appointment_availability': check_appointment_availability,
+  'schedule_appointment': schedule_appointment,
+  'delete_appointment': delete_appointment
+} as any
+
 const query_llm = async (content: string) => {
   messages.push({
     role: "user",
@@ -87,14 +114,30 @@ const query_llm = async (content: string) => {
   return response.choices[0].message.content;
 };
 
+// Process the llm response, send it to user or do function call
+const process_llm_response = async (response: any) => {
+  const parsedJson = JSON.parse(response);
+
+  if (parsedJson.to == 'user') {
+    console.log(parsedJson.message);
+  } else if (parsedJson.to == 'system') {
+    const fn = parsedJson.function_call.function;
+    const args = parsedJson.function_call.arguments;
+
+    const functionResponse = function_map[fn](...args);
+
+    await process_llm_response(await query_llm('response is ' + functionResponse ? 'true' : 'false'))
+  }
+};
+
 const main = async () => {
   while (true) {
-    const userInput: string = await new Promise((resolve) => {
+    const input: string = await new Promise((resolve) => {
       rl.question("Say something: ", resolve);
     });
 
-    const response = await query_llm(userInput);
-    console.log("Assistant: ", response);
+    const response = await query_llm(input);
+    await process_llm_response(response);
   }
 };
 
