@@ -1,0 +1,22 @@
+{
+  "name": "ai-agent-appointment-scheduler",
+  "version": "1.0.0",
+  "description": "An AI agent that schedules appointments.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ashvinisaw/ai-agent-appointment-scheduler.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
